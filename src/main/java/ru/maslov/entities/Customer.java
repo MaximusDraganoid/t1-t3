@@ -3,6 +3,8 @@ package ru.maslov.entities;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Customer extends Thread{
@@ -16,7 +18,7 @@ public class Customer extends Thread{
     private CyclicBarrier barrier;
     private ReentrantLock lock;
 
-    public Customer(int seed,
+    public Customer(long seed,
                     Storage storage,
                     CyclicBarrier barrier,
                     ReentrantLock lock) {
@@ -30,21 +32,19 @@ public class Customer extends Thread{
 
     @Override
     public void run() {
+
         while (!storage.isEmpty()) {
+
+            waiting();
             int numOfProducts = generator.nextInt(MAX_GETTING_PRODUCT) + 1;
-            lock.lock();
-            if (!storage.isEmpty()) {
-                numOfProducts = storage.giveOutTheProduct(numOfProducts);
+
+            numOfProducts = storage.giveOutTheProduct(numOfProducts);
+            if (numOfProducts != 0) {
                 bayedNumOfProduct += numOfProducts;
                 numberOfTripsToTheStore++;
             }
-            lock.unlock();
-
             waiting();
         }
-
-        while (barrier.getNumberWaiting() != 0)
-            waiting();
 
         System.out.println(this);
     }

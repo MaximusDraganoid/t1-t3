@@ -47,7 +47,7 @@ public class Runner {
         Customer[] customers = new Customer[numOfCustomers];
 
         for (int i = 0; i < numOfCustomers; i++) {
-            customers[i] = new Customer(i, storage, barrier, lock);
+            customers[i] = new Customer(System.currentTimeMillis(), storage, barrier, lock);
         }
 
         for (int i = 0; i < numOfCustomers; i++) {
